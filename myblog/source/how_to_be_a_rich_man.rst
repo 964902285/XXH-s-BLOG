@@ -1,4 +1,4 @@
-01 详解Python中的__init__和__new__的区别
+01 详解Python3中的__init__和__new__的区别
 ======================
 
 1.1 __init__ 方法是什么？
@@ -17,9 +17,10 @@ class Person(object):
 if __name__ == '__main__':
     Piglei = Person('Piglei', 24)
     print(Piglei)
-    
+	
 执行结果：
 	<Person: Piglei(24)>
+
 这样便是__init__最普通的用法了。但__init__其实不是实例化一个类的时候第一个被调用 的方法。当使用 Persion(name, age) 这样的表达式来实例化一个类时，最先被调用的方法 其实是 __new__ 方法。
 
 
@@ -61,6 +62,62 @@ if __name__ == '__main__':
 1.__init__ 通常用于初始化一个新实例，控制这个初始化的过程，比如添加一些属性， 做一些额外的操作，发生在类实例被创建完以后。它是实例级别的方法。
 2.__new__ 通常用于控制生成一个新实例的过程。它是类级别的方法。
 但是说了这么多，__new__最通常的用法是什么呢，我们什么时候需要__new__？
+
+
+1.3 __new__ 的作用	
+---------------------	
+	
+依照Python官方文档的说法，__new__方法主要是当你继承一些不可变的class时(比如int, str, tuple)， 提供给你一个自定义这些类的实例化过程的途径。
+首先我们来看一下第一个功能，具体我们可以用int来作为一个例子：
+假如我们需要一个永远都是正数的整数类型，通过集成int，我们可能会写出这样的代码：
+
+class PositiveInteger(int):
+    def __init__(self, value):
+        super(PositiveInteger, self).__init__()
+
+
+i = PositiveInteger(-3)
+print(i)
+
+但运行后会发现，结果根本不是我们想的那样，我们任然得到了-3。这是因为对于int这种 不可变的对象，我们只有重载它的__new__方法才能起到自定义的作用。
+这是修改后的代码：
+
+class PositiveInteger(int):
+    def __new__(cls, value):
+        return super(PositiveInteger, cls).__new__(cls, abs(value))
+
+
+i = PositiveInteger(-3)
+print(i)
+
+通过重载__new__方法，我们实现了需要的功能。
+
+	
+1.4 用__new__来实现单例	
+---------------------
+
+事实上，当我们理解了__new__方法后，我们还可以利用它来做一些其他有趣的事情，比如实现 设计模式中的 单例模式(singleton) 。
+因为类每一次实例化后产生的过程都是通过__new__来控制的，所以通过重载__new__方法，我们 可以很简单的实现单例模式。
+
+class Singleton(object):
+    def __new__(cls):
+        # 关键在这里，每一次实例化时，我们都只会返回这同一个instance对象
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(Singleton, cls).__new__(cls)
+        return cls.instance
+
+object1 = Singleton()
+object2 = Singleton()
+
+object1.attr1 = 'value1'
+print(object1.attr1, object2.attr1)
+print(object1 is object2)
+
+执行结果：
+		value1 value1
+		True
+		
+可以看到obj1和obj2是同一个实例。	
 
 
 
