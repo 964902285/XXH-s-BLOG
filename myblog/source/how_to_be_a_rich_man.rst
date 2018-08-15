@@ -17,7 +17,9 @@ class Person(object):
 if __name__ == '__main__':
     Piglei = Person('Piglei', 24)
     print(Piglei)
-
+    
+执行结果：
+	<Person: Piglei(24)>
 这样便是__init__最普通的用法了。但__init__其实不是实例化一个类的时候第一个被调用 的方法。当使用 Persion(name, age) 这样的表达式来实例化一个类时，最先被调用的方法 其实是 __new__ 方法。
 
 
