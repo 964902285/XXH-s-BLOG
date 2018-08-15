@@ -8,6 +8,6 @@ Welcome to XXH's BLOG's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: 目录:
 
    how_to_be_a_rich_man
